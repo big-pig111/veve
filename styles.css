@@ -102,6 +102,7 @@ body {
 }
 
 /* 内容区：让消息滚动，避免 body 滚动 */
+/* 全屏对话布局：让消息区占满，输入框悬浮底部 */
 #app {
   position: fixed;
   inset: env(safe-area-inset-top) 0 calc(72px + env(safe-area-inset-bottom)) 0;
@@ -113,15 +114,24 @@ body {
   max-width: var(--page-max-width);
   margin: 0 auto;
   padding: 80px var(--space-4) var(--space-4);
-  padding-right: calc(var(--space-4) + var(--hero-size) + min(6vw, 56px));
+  padding-right: var(--space-4);
   width: 100%;
   height: 100%;
   overflow-y: auto;
-  scrollbar-width: thin;
+  /* 隐藏滚动条（Firefox） */
+  scrollbar-width: none;
+  /* 隐藏滚动条（IE/旧 Edge） */
+  -ms-overflow-style: none;
 }
 
-#messages::-webkit-scrollbar { width: 8px; }
-#messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.25); border-radius: 8px; }
+/* 隐藏滚动条（WebKit） */
+#messages::-webkit-scrollbar { width: 0; height: 0; }
+
+/* 桌面端悬停时展示极细滚动条 */
+@media (hover: hover) and (pointer: fine) {
+  #messages:hover::-webkit-scrollbar { width: 6px; height: 6px; }
+  #messages:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.14); border-radius: 6px; }
+}
 
 /* 内容进入时的轻微淡入 */
 .message { animation: fadeIn 240ms var(--easing); }
@@ -156,7 +166,7 @@ body {
   padding: var(--space-4);
   padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom));
   display: grid;
-  grid-template-columns: 40px 1fr 52px;
+  grid-template-columns: 44px 1fr 44px;
   align-items: end;
   gap: var(--space-3);
   max-width: var(--page-max-width);
@@ -176,6 +186,14 @@ body {
 
 #settings-btn:hover, #send:hover { background: rgba(255,255,255,0.16); }
 #settings-btn:active, #send:active { transform: translateY(1px); }
+
+/* 发送按钮美化为圆形悬浮键风格 */
+#send {
+  width: 44px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+}
 
 #input {
   min-height: 44px;
@@ -242,8 +260,8 @@ body {
 }
 
 /* Telegram Mini Apps 内强制显示 3D（自适应小屏比例） */
-.tg #hero-3d { display: block !important; right: 8px; top: auto; bottom: calc(96px + env(safe-area-inset-bottom)); transform: none; width: min(280px, 46vw); height: min(280px, 46vw); }
-.tg #messages { padding-right: calc(var(--space-4) + min(50vw, 320px)); }
+.tg #hero-3d { display: block !important; right: 10px; top: auto; bottom: calc(120px + env(safe-area-inset-bottom)); transform: none; width: min(240px, 44vw); height: min(240px, 44vw); }
+.tg #messages { padding-right: var(--space-4); }
 
 
 
