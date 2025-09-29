@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0910">
+    <meta name="color-scheme" content="dark">
+    <title>简约对话</title>
+    
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    
+
+    <div id="hero-3d" aria-hidden="true">
+      <model-viewer
+        src="bot.glb"
+        auto-rotate
+        auto-rotate-delay="0"
+        rotation-per-second="20deg"
+        exposure="1.25"
+        shadow-intensity="0.2"
+        environment-image="neutral"
+        /* 禁用交互：不显示控制，不允许缩放/旋转拖拽 */
+        disable-zoom
+        disable-pan
+        disable-tap
+        interaction-prompt="none"
+        style="background-color: transparent; --poster-color: transparent;"
+      ></model-viewer>
+    </div>
+
+    <div class="overlay" aria-hidden="true"></div>
+
+    <main id="app" aria-label="对话">
+      <div id="messages" role="log" aria-live="polite"></div>
+    </main>
+
+    <form id="composer" autocomplete="off">
+      <button id="settings-btn" type="button" aria-label="设置">⚙️</button>
+      <textarea id="input" rows="1" placeholder="开始输入…" aria-label="输入消息"></textarea>
+      <button id="send" type="submit" aria-label="发送">↩︎</button>
+    </form>
+
+    <dialog id="settings">
+      <form method="dialog" id="settings-form">
+        <h3>服务设置（可选）</h3>
+        <label>访问密钥
+          <input id="apiKey" type="password" placeholder="sk-..." autocomplete="off">
+        </label>
+        <label>引擎
+          <input id="model" type="text" value="gpt-4o-mini">
+        </label>
+        <menu>
+          <button value="cancel">取消</button>
+          <button id="saveSettings" value="default">保存</button>
+        </menu>
+        <p class="note">保存在本地浏览器。请注意安全。</p>
+      </form>
+    </dialog>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <script src="script.js" defer></script>
+  </body>
+  </html>
+
+
+
