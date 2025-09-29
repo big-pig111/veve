@@ -23,6 +23,8 @@ if (tg) {
     // 同步主题到 CSS 变量（深色为主）
     document.documentElement.style.setProperty('--tg-bg', tg.backgroundColor || '#0a0910');
     document.documentElement.style.setProperty('--tg-text', tg.textColor || 'rgba(255,255,255,0.92)');
+    // 标记 Telegram 环境，供样式覆盖使用
+    document.documentElement.classList.add('tg');
   } catch {}
 }
 
