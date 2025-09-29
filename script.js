@@ -24,7 +24,10 @@ if (tg) {
     document.documentElement.style.setProperty('--tg-bg', tg.backgroundColor || '#0a0910');
     document.documentElement.style.setProperty('--tg-text', tg.textColor || 'rgba(255,255,255,0.92)');
     // 标记 Telegram 环境，供样式覆盖使用
-    document.documentElement.classList.add('tg');
+    document.documentElement.classList.add('tg', 'fullchat');
+    if (tg.MainButton) {
+      try { tg.MainButton.hide(); } catch {}
+    }
   } catch {}
 }
 
@@ -111,13 +114,7 @@ function autosizeTextarea() {
 
 elements.input.addEventListener('input', autosizeTextarea);
 
-// 绑定 Telegram 主按钮发送
-if (tg && tg.MainButton) {
-  tg.MainButton.setParams({ text: '发送', is_visible: true });
-  tg.onEvent('mainButtonClicked', () => {
-    elements.composer.requestSubmit();
-  });
-}
+// 不使用 Telegram 大按钮，统一用内置发送键
 
 // 初始欢迎
 if (chatHistory.length === 0) {
