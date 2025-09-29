@@ -241,5 +241,9 @@ body {
   #messages { padding-right: var(--space-4); }
 }
 
+/* Telegram Mini Apps 内强制显示 3D（自适应小屏比例） */
+.tg #hero-3d { display: block !important; right: 8px; top: auto; bottom: calc(96px + env(safe-area-inset-bottom)); transform: none; width: min(280px, 46vw); height: min(280px, 46vw); }
+.tg #messages { padding-right: calc(var(--space-4) + min(50vw, 320px)); }
+
 
 
