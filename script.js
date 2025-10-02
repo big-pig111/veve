@@ -183,6 +183,25 @@ async function getAIResponse(userText, history) {
     { role: 'user', content: userText },
   ];
 
+  // 更智能的触发：命中实时关键词（天气/最新/今天/现在/实时/新闻/价格/汇率等）或以 web/搜索/查 开头
+  function isWebQuery(text) {
+    const t = text.trim().toLowerCase();
+    if (/^(web|搜索|查)\b/.test(t)) return true;
+    const realtime = /(天气|气温|现在|今日|今天|明天|本周|实时|最新|新闻|快讯|价格|股价|汇率|航班|路况|限号)/i;
+    return realtime.test(text);
+  }
+  const shouldWeb = isWebQuery(userText);
+  if (shouldWeb && window.functionsBase) {
+    const res = await fetch(`${window.functionsBase}/searchAnswer`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ q: userText.replace(/^(web|搜索|查)\s*/i,'').trim(), model: model || 'gpt-4o-mini' }),
+    });
+    if (!res.ok) throw new Error('search error: ' + res.status);
+    const data = await res.json();
+    const content = (data && data.content || '').trim();
+    if (content) return content;
+  }
+
   if (!window.functionsBase) {
     // 未配置云函数，走本地回退
     return localFallback(userText);
