@@ -129,8 +129,9 @@ elements.composer.addEventListener('submit', async (e) => {
     chatHistory.push({ role: 'ai', content: reply });
     saveHistory(chatHistory);
   } catch (err) {
-    thinkingEl.textContent = '抱歉，出错了。已切换为本地回答。';
-    const fallback = localFallback(text);
+    console.error('proxy error', err);
+    thinkingEl.textContent = '后端不可用，已切换为本地回答。';
+    const fallback = localFallback(text) + (err && err.message ? `\n(提示: ${err.message})` : '');
     const { bubble } = createMessageElement('ai', '');
     thinkingEl.parentElement.replaceChild(bubble, thinkingEl);
     await typeText(bubble, fallback);
