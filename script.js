@@ -192,6 +192,17 @@ async function getAIResponse(userText, history) {
   }
   const shouldWeb = isWebQuery(userText);
   if (shouldWeb && window.functionsBase) {
+    // 若包含天气关键词，优先调用实时天气接口
+    if (/(天气|气温|温度)/i.test(userText)) {
+      const resW = await fetch(`${window.functionsBase}/weatherNow`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ q: userText })
+      });
+      if (resW.ok) {
+        const data = await resW.json();
+        if (data && data.content) return data.content;
+      }
+    }
     const res = await fetch(`${window.functionsBase}/searchAnswer`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ q: userText.replace(/^(web|搜索|查)\s*/i,'').trim(), model: model || 'gpt-4o-mini' }),
