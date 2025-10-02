@@ -42,7 +42,7 @@ function saveHistory(history) {
   } catch {}
 }
 
-function loadSettings() { return { model: 'gpt-4o-mini' }; }
+function loadSettings() { return { model: 'gpt-4o' }; }
 function saveSettingsToStorage() {}
 
 let chatHistory = loadHistory();
@@ -92,6 +92,14 @@ function autosizeTextarea() {
 }
 
 elements.input.addEventListener('input', autosizeTextarea);
+
+// 回车发送，Shift+Enter 换行
+elements.input.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    elements.composer.requestSubmit();
+  }
+});
 
 // 不使用 Telegram 大按钮，统一用内置发送键
 
@@ -205,7 +213,7 @@ async function getAIResponse(userText, history) {
     }
     const res = await fetch(`${window.functionsBase}/searchAnswer`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ q: userText.replace(/^(web|搜索|查)\s*/i,'').trim(), model: model || 'gpt-4o-mini' }),
+      body: JSON.stringify({ q: userText.replace(/^(web|搜索|查)\s*/i,'').trim(), model: model || 'gpt-4o' }),
     });
     if (!res.ok) throw new Error('search error: ' + res.status);
     const data = await res.json();
@@ -221,7 +229,7 @@ async function getAIResponse(userText, history) {
   const res = await fetch(`${window.functionsBase}/chatProxy`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model: model || 'gpt-4o-mini', messages, temperature: 0.6 }),
+    body: JSON.stringify({ model: model || 'gpt-4o', messages, temperature: 0.6 }),
   });
   if (!res.ok) throw new Error('proxy error: ' + res.status);
   const data = await res.json();
