@@ -37,29 +37,15 @@
     </main>
 
     <form id="composer" autocomplete="off">
-      <button id="settings-btn" type="button" aria-label="设置">⚙️</button>
       <textarea id="input" rows="1" placeholder="开始输入…" aria-label="输入消息"></textarea>
       <button id="send" type="submit" aria-label="发送">→</button>
     </form>
 
-    <dialog id="settings">
-      <form method="dialog" id="settings-form">
-        <h3>服务设置（可选）</h3>
-        <label>访问密钥
-          <input id="apiKey" type="password" placeholder="sk-..." autocomplete="off">
-        </label>
-        <label>引擎
-          <input id="model" type="text" value="gpt-4o-mini">
-        </label>
-        <menu>
-          <button value="cancel">取消</button>
-          <button id="saveSettings" value="default">保存</button>
-        </menu>
-        <p class="note">保存在本地浏览器。请注意安全。</p>
-      </form>
-    </dialog>
-
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+    <script src="firebase.js" defer></script>
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <script src="script.js" defer></script>
   </body>

@@ -5,12 +5,6 @@ const elements = {
   composer: document.getElementById('composer'),
   input: document.getElementById('input'),
   send: document.getElementById('send'),
-  settingsBtn: document.getElementById('settings-btn'),
-  settingsDialog: document.getElementById('settings'),
-  settingsForm: document.getElementById('settings-form'),
-  apiKey: document.getElementById('apiKey'),
-  model: document.getElementById('model'),
-  saveSettings: document.getElementById('saveSettings'),
   bgVideo: document.getElementById('bg-video'),
 };
 
@@ -31,11 +25,7 @@ if (tg) {
   } catch {}
 }
 
-const STORAGE_KEYS = {
-  history: 'chat.history',
-  apiKey: 'openai.apiKey',
-  model: 'openai.model',
-};
+const STORAGE_KEYS = { history: 'chat.history' };
 
 function loadHistory() {
   try {
@@ -52,19 +42,8 @@ function saveHistory(history) {
   } catch {}
 }
 
-function loadSettings() {
-  return {
-    apiKey: localStorage.getItem(STORAGE_KEYS.apiKey) || '',
-    model: localStorage.getItem(STORAGE_KEYS.model) || 'gpt-4o-mini',
-  };
-}
-
-function saveSettingsToStorage({ apiKey, model }) {
-  try {
-    if (apiKey !== undefined) localStorage.setItem(STORAGE_KEYS.apiKey, apiKey);
-    if (model !== undefined) localStorage.setItem(STORAGE_KEYS.model, model);
-  } catch {}
-}
+function loadSettings() { return { model: 'gpt-4o-mini' }; }
+function saveSettingsToStorage() {}
 
 let chatHistory = loadHistory();
 
@@ -126,24 +105,7 @@ if (chatHistory.length === 0) {
 renderAll(chatHistory);
 autosizeTextarea();
 
-// 设置逻辑
-const currentSettings = loadSettings();
-elements.apiKey.value = currentSettings.apiKey;
-elements.model.value = currentSettings.model;
-
-elements.settingsBtn.addEventListener('click', () => {
-  if (typeof elements.settingsDialog.showModal === 'function') {
-    elements.settingsDialog.showModal();
-  }
-});
-
-elements.saveSettings.addEventListener('click', (e) => {
-  e.preventDefault();
-  const apiKey = elements.apiKey.value.trim();
-  const model = elements.model.value.trim() || 'gpt-4o-mini';
-  saveSettingsToStorage({ apiKey, model });
-  elements.settingsDialog.close();
-});
+// 无设置逻辑，全部在后端配置
 
 // 发送消息
 elements.composer.addEventListener('submit', async (e) => {
@@ -211,12 +173,7 @@ function localFallback(input) {
 }
 
 async function getAIResponse(userText, history) {
-  const { apiKey, model } = loadSettings();
-  if (!apiKey) {
-    // 没有 Key，直接本地回退
-    return localFallback(userText);
-  }
-
+  const { model } = loadSettings();
   // 组装消息：只取最近若干条，控制上下文
   const recent = history.slice(-12);
   const messages = [
@@ -225,27 +182,19 @@ async function getAIResponse(userText, history) {
     { role: 'user', content: userText },
   ];
 
-  const body = {
-    model: model || 'gpt-4o-mini',
-    messages,
-    temperature: 0.6,
-  };
-
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    throw new Error('OpenAI API error: ' + res.status);
+  if (!window.functionsBase) {
+    // 未配置云函数，走本地回退
+    return localFallback(userText);
   }
 
+  const res = await fetch(`${window.functionsBase}/chatProxy`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: model || 'gpt-4o-mini', messages, temperature: 0.6 }),
+  });
+  if (!res.ok) throw new Error('proxy error: ' + res.status);
   const data = await res.json();
-  const content = data?.choices?.[0]?.message?.content?.trim();
+  const content = (data && data.content || '').trim();
   if (!content) throw new Error('No content');
   return content;
 }
