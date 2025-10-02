@@ -8,6 +8,7 @@
   --space-5: 20px;
   --space-6: 24px;
   --radius: 12px;
+  --radius-lg: 16px;
   --border: 1px;
   --bg-dim: rgba(10, 10, 10, 0.45);
   --glass: rgba(255, 255, 255, 0.14);
@@ -26,6 +27,8 @@ body {
   color: var(--text-1);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   /* 黑紫多层径向渐变，营造深度 */
   background:
     radial-gradient(1200px 58% at 60% -10%, #1a0f2a 0%, rgba(10,8,14,0.92) 60%, #07060a 100%),
@@ -148,18 +151,21 @@ body {
   width: 100%;
 }
 .bubble {
-  max-width: min(96%, 900px);
+  max-width: min(92ch, 900px);
   padding: var(--space-4) var(--space-5);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   border: var(--border) solid rgba(255,255,255,0.18);
-  background: var(--glass);
+  background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.10));
   backdrop-filter: blur(10px) saturate(1.2);
   -webkit-backdrop-filter: blur(10px) saturate(1.2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 10px 28px rgba(0,0,0,0.28);
+  transition: transform 160ms var(--easing), box-shadow 160ms var(--easing), border-color 160ms var(--easing);
 }
 .message.user { justify-items: end; }
-.message.user .bubble { background: var(--glass-strong); color: var(--text-0); border-color: rgba(255,255,255,0.22); }
+.message.user .bubble { background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.12)); color: var(--text-0); border-color: rgba(255,255,255,0.22); }
 .message.ai { justify-items: start; }
-.message .meta { color: var(--text-2); font-size: 12px; }
+.message .meta { color: var(--text-2); font-size: 12px; margin-top: 4px; letter-spacing: 0.2px; }
+.message:hover .bubble { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 14px 36px rgba(0,0,0,0.34); }
 
 /* 底部输入区 */
 #composer {
@@ -179,15 +185,15 @@ body {
 #settings-btn, #send {
   height: 44px;
   border-radius: 10px;
-  border: var(--border) solid rgba(255,255,255,0.2);
-  background: var(--glass);
+  border: var(--border) solid rgba(255,255,255,0.26);
+  background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.12));
   color: var(--text-1);
   cursor: pointer;
   backdrop-filter: blur(8px);
   transition: background 160ms var(--easing), transform 120ms var(--easing), border-color 160ms var(--easing);
 }
 
-#settings-btn:hover, #send:hover { background: rgba(255,255,255,0.16); }
+#settings-btn:hover, #send:hover { background: rgba(255,255,255,0.18); }
 #settings-btn:active, #send:active { transform: translateY(1px); }
 
 /* 发送按钮美化为圆形悬浮键风格 */
@@ -215,6 +221,18 @@ body {
 
 #input::placeholder { color: rgba(255,255,255,0.6); }
 #input:focus { border-color: rgba(255,255,255,0.32); background: rgba(255,255,255,0.16); box-shadow: var(--shadow-1); }
+
+/* 富文本可读性（链接/代码块） */
+.bubble a { color: var(--text-0); text-decoration: underline; text-underline-offset: 2px; }
+.bubble pre, .bubble code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: block;
+  overflow-x: auto;
+}
 
 /* 设置弹窗 */
 #settings {
