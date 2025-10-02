@@ -1,4 +1,4 @@
-/* 极简 AI 对话 - 前端逻辑（可离线本地回退，可选 OpenAI） */
+/* 极简 AI 对话 - 前端逻辑（由 veve 开发） */
 
 const elements = {
   messages: document.getElementById('messages'),
@@ -57,7 +57,7 @@ function createMessageElement(role, text) {
 
   const meta = document.createElement('div');
   meta.className = 'meta';
-  meta.textContent = role === 'user' ? '你' : '回应';
+  meta.textContent = role === 'user' ? 'You' : 'Assistant';
 
   wrapper.appendChild(bubble);
   wrapper.appendChild(meta);
@@ -103,9 +103,9 @@ elements.input.addEventListener('keydown', (e) => {
 
 // 不使用 Telegram 大按钮，统一用内置发送键
 
-// 初始欢迎
+// Initial welcome
 if (chatHistory.length === 0) {
-  const hello = '准备就绪。';
+  const hello = 'Hello! I\'m an AI assistant developed by veve. How can I help you today?';
   chatHistory.push({ role: 'ai', content: hello });
   saveHistory(chatHistory);
 }
@@ -128,7 +128,7 @@ elements.composer.addEventListener('submit', async (e) => {
   saveHistory(chatHistory);
   appendMessage('user', text);
 
-  const thinkingEl = appendMessage('ai', '处理中…');
+  const thinkingEl = appendMessage('ai', 'Thinking...');
 
   try {
     const reply = await getAIResponse(text, chatHistory);
@@ -138,8 +138,8 @@ elements.composer.addEventListener('submit', async (e) => {
     saveHistory(chatHistory);
   } catch (err) {
     console.error('proxy error', err);
-    thinkingEl.textContent = '后端不可用，已切换为本地回答。';
-    const fallback = localFallback(text) + (err && err.message ? `\n(提示: ${err.message})` : '');
+    thinkingEl.textContent = 'Backend unavailable, using local fallback.';
+    const fallback = localFallback(text) + (err && err.message ? `\n(Note: ${err.message})` : '');
     const { bubble } = createMessageElement('ai', '');
     thinkingEl.parentElement.replaceChild(bubble, thinkingEl);
     await typeText(bubble, fallback);
@@ -169,16 +169,16 @@ function typeText(el, text) {
   });
 }
 
-// 本地离线回退：简要复述 + 建议
+// Local offline fallback: brief echo + suggestion
 function localFallback(input) {
   const trimmed = input.replace(/\s+/g, ' ').slice(0, 140);
   const hints = [
-    '可帮助总结、润色、翻译、整理要点。',
-    '也可以在此基础上继续展开或收敛。',
-    '随时输入新的方向或补充信息。',
+    'I can help with summarizing, refining, translating, or organizing key points.',
+    'Feel free to expand or narrow down the topic.',
+    'You can provide more context or ask follow-up questions anytime.',
   ];
   const tip = hints[Math.floor(Math.random() * hints.length)];
-  return `你说："${trimmed}"。已收到。` + '\n' + tip;
+  return `You said: "${trimmed}". Got it.` + '\n' + tip;
 }
 
 async function getAIResponse(userText, history) {
@@ -186,22 +186,22 @@ async function getAIResponse(userText, history) {
   // 组装消息：只取最近若干条，控制上下文
   const recent = history.slice(-12);
   const messages = [
-    { role: 'system', content: '请以简洁、礼貌、准确的中文回答，避免多余营销或拟人话术。' },
+    { role: 'system', content: 'You are an AI assistant developed by veve. Please provide concise, polite, and accurate responses. Avoid unnecessary marketing language or overly anthropomorphic tone.' },
     ...recent.map(m => ({ role: m.role === 'ai' ? 'assistant' : m.role, content: m.content })),
     { role: 'user', content: userText },
   ];
 
-  // 更智能的触发：命中实时关键词（天气/最新/今天/现在/实时/新闻/价格/汇率等）或以 web/搜索/查 开头
+  // Smarter trigger: match real-time keywords or web/search prefix
   function isWebQuery(text) {
     const t = text.trim().toLowerCase();
-    if (/^(web|搜索|查)\b/.test(t)) return true;
-    const realtime = /(天气|气温|现在|今日|今天|明天|本周|实时|最新|新闻|快讯|价格|股价|汇率|航班|路况|限号)/i;
+    if (/^(web|search|find)\b/.test(t)) return true;
+    const realtime = /(weather|temperature|now|today|tomorrow|this week|real-time|latest|news|breaking|price|stock|exchange rate|flight|traffic)/i;
     return realtime.test(text);
   }
   const shouldWeb = isWebQuery(userText);
   if (shouldWeb && window.functionsBase) {
-    // 若包含天气关键词，优先调用实时天气接口
-    if (/(天气|气温|温度)/i.test(userText)) {
+    // If contains weather keywords, prioritize weather API
+    if (/(weather|temperature|forecast)/i.test(userText)) {
       const resW = await fetch(`${window.functionsBase}/weatherNow`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ q: userText })
@@ -213,7 +213,7 @@ async function getAIResponse(userText, history) {
     }
     const res = await fetch(`${window.functionsBase}/searchAnswer`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ q: userText.replace(/^(web|搜索|查)\s*/i,'').trim(), model: model || 'gpt-4o' }),
+      body: JSON.stringify({ q: userText.replace(/^(web|search|find)\s*/i,'').trim(), model: model || 'gpt-4o' }),
     });
     if (!res.ok) throw new Error('search error: ' + res.status);
     const data = await res.json();

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -9,13 +9,11 @@
     <meta name="theme-color" content="#0a0910">
     <meta name="color-scheme" content="dark">
     <link rel="icon" href="data:,">
-    <title>简约对话</title>
+    <title>veve AI Assistant</title>
     
-    <link rel="stylesheet" href="styles.css?t=1759394051680">
+    <link rel="stylesheet" href="styles.css?v=1759397032">
   </head>
   <body>
-    
-
     <div id="hero-3d" aria-hidden="true">
       <model-viewer
         src="bot.glb"
@@ -25,7 +23,6 @@
         exposure="1.25"
         shadow-intensity="0.2"
         environment-image="neutral"
-        /* 禁用交互：不显示控制，不允许缩放/旋转拖拽 */
         disable-zoom
         disable-pan
         disable-tap
@@ -36,19 +33,19 @@
 
     <div class="overlay" aria-hidden="true"></div>
 
-    <main id="app" aria-label="对话">
+    <main id="app" aria-label="Chat">
       <div id="messages" role="log" aria-live="polite"></div>
     </main>
 
     <form id="composer" autocomplete="off">
-      <textarea id="input" rows="1" placeholder="开始输入…" aria-label="输入消息"></textarea>
-      <button id="send" type="submit" aria-label="发送">→</button>
+      <textarea id="input" rows="1" placeholder="Type a message..." aria-label="Message input"></textarea>
+      <button id="send" type="submit" aria-label="Send">→</button>
     </form>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
     <script>window.functionsBase='https://us-central1-chat-294cc.cloudfunctions.net';</script>
-    <script src="script.js?t=1759394086985" defer></script>
+    <script src="script.js?v=1759397032" defer></script>
   </body>
   </html>
 
